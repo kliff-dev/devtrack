@@ -10,6 +10,7 @@ npm run dev      # http://localhost:5173 — also syncs activity on start
 npm run sync     # gather activity into public/data/sync.json
 npm run build    # type-check + production build
 npm run lint     # oxlint
+npm test         # collector parsers, sync merging and stats (node --test, no extra packages)
 ```
 
 On first launch with no synced activity, DevTrack seeds sample projects so the interface looks complete; **Settings → Data** can remove or restore them. With a sync file present it starts from your real projects instead. Everything the app holds is saved to `localStorage`.

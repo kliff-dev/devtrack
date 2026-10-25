@@ -23,11 +23,12 @@ export async function gitAvailable(): Promise<boolean> {
   return (await git(['--version'])) !== undefined
 }
 
-/** Turns any remote URL (ssh, git@, https with .git) into a browsable https URL. */
+/** Turns any remote URL (ssh, git@, https with .git) into a browsable https URL; local paths give undefined. */
 export function toHttpsUrl(remote: string): string | undefined {
   const trimmed = remote.trim().replace(/\.git$/, '')
   if (/^https?:\/\//.test(trimmed)) return trimmed
-  const ssh = /^(?:ssh:\/\/)?(?:[\w.-]+@)?([\w.-]+)[:/]\/?(.+)$/.exec(trimmed)
+  // Host must contain a dot so a Windows path like C:\repo isn't mistaken for host "C".
+  const ssh = /^(?:ssh:\/\/)?(?:[\w.-]+@)?([\w-]+(?:\.[\w-]+)+)[:/]\/?(.+)$/.exec(trimmed)
   return ssh ? `https://${ssh[1]}/${ssh[2]}` : undefined
 }
 

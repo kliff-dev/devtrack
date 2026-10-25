@@ -1,0 +1,4 @@
+# Source is authored with LF; keep it that way on every checkout.
+* text=auto eol=lf
+*.png binary
+*.ico binary
