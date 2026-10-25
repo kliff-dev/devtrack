@@ -45,7 +45,11 @@ const MARKER_FILES: [file: string, label: string][] = [
   ['pubspec.yaml', 'Flutter'],
   ['CMakeLists.txt', 'C++'],
   ['mix.exs', 'Elixir'],
+  ['firebase.json', 'Firebase'],
 ]
+
+// A Dart analysis config next to platform folders is a Flutter app even without pubspec.yaml.
+const FLUTTER_PLATFORM_DIRS = ['android', 'ios', 'macos', 'windows', 'linux']
 
 // Plain projects without a manifest (e.g. a PHP site under wamp): judge by top-level files.
 const EXTENSION_TECH: Record<string, string> = {
@@ -88,6 +92,9 @@ function detectTechnologies(pkg: PackageJson | undefined, files: string[]): stri
     if (found.length === 0) add('Node.js')
   }
   for (const [file, label] of MARKER_FILES) if (files.includes(file)) add(label)
+  if (files.includes('analysis_options.yaml') && !found.includes('Flutter')) {
+    add(files.some((file) => FLUTTER_PLATFORM_DIRS.includes(file)) ? 'Flutter' : 'Dart')
+  }
 
   if (found.length === 0) {
     const counts = new Map<string, number>()
