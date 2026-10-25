@@ -29,6 +29,8 @@ Sessions come from the message timestamps: a pause longer than `idleGapMinutes` 
 
 Each session or commit is attributed to the nearest enclosing git repository, or the working directory itself. Folders the app hasn't seen become new projects, named after the folder, with technologies guessed from `package.json` and marker files. Projects you create by hand can claim a folder through **Local folder** in the project form. Deleting a folder-linked project puts that folder on an ignore list (**Settings → Activity sources**) so the next sync doesn't bring it back.
 
+Folders that no longer exist on disk are skipped (set `includeMissingFolders: true` to keep them), and `excludePaths` leaves out folders you don't want tracked. A project that a sync created, and that you haven't edited or added actions to, disappears again when its folder drops out of the sync; once you edit it, it's yours and stays.
+
 Under `npm run dev`, **Sync now** on the dashboard and in Settings re-runs the collector through the dev server. A production build has no server, so run `npm run sync` and reload.
 
 ### Configuration
@@ -37,9 +39,11 @@ Under `npm run dev`, **Sync now** on the dashboard and in Settings re-runs the c
 
 ```json
 {
-  "lookbackDays": 90,
+  "lookbackDays": 365,
   "idleGapMinutes": 30,
   "scanDirs": ["~/Projects", "C:\\wamp64\\www"],
+  "excludePaths": ["~/Projects/old-experiment"],
+  "includeMissingFolders": false,
   "claudeDir": "~/.claude",
   "codexDir": "~/.codex"
 }

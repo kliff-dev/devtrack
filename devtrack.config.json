@@ -1,5 +1,7 @@
 {
-  "lookbackDays": 90,
+  "lookbackDays": 365,
   "idleGapMinutes": 30,
-  "scanDirs": ["~/Projects", "C:\\wamp64\\www"]
+  "scanDirs": ["~/Projects", "C:\\wamp64\\www"],
+  "excludePaths": [],
+  "includeMissingFolders": false
 }

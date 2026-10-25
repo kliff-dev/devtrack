@@ -73,9 +73,25 @@ export async function runCollector(config: CollectorConfig, now = new Date()): P
       }
     : { source: 'git', available: false, note: 'git is not on PATH' }
 
+  // Folders that were deleted are usually abandoned projects; they only clutter the
+  // dashboard unless the config says otherwise. Explicit exclusions apply either way.
+  const excluded = new Set(config.excludePaths.map(pathKey))
+  const skippedRoots = new Set<string>()
+  const keepDecisions = new Map<string, boolean>()
+  const keep = (path: string) => {
+    const key = pathKey(path)
+    let decision = keepDecisions.get(key)
+    if (decision === undefined) {
+      decision = !excluded.has(key) && (config.includeMissingFolders || existsSync(path))
+      keepDecisions.set(key, decision)
+      if (!decision) skippedRoots.add(key)
+    }
+    return decision
+  }
+
   const sinceIso = since.toISOString()
   const activity = [...sessions, ...commits]
-    .filter((entry) => entry.timestamp >= sinceIso)
+    .filter((entry) => entry.timestamp >= sinceIso && keep(entry.projectPath))
     .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
   for (const entry of activity) register(entry.projectPath).entries += 1
 
@@ -100,5 +116,6 @@ export async function runCollector(config: CollectorConfig, now = new Date()): P
     sources: [claude.status, codex.status, gitStatus],
     projects,
     activity,
+    skippedFolders: skippedRoots.size,
   }
 }

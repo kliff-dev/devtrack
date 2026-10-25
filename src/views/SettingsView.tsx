@@ -48,8 +48,11 @@ export function SettingsView() {
   const payload = sync.payload
   const syncedCount = activity.filter((entry) => entry.source && entry.source !== 'manual').length
   const keepsSynced = syncedCount > 0 ? ' Synced activity is kept.' : ''
+  const skipped = payload?.skippedFolders
+    ? ` · ${payload.skippedFolders} deleted or excluded ${payload.skippedFolders === 1 ? 'folder' : 'folders'} skipped`
+    : ''
   const syncHint = payload
-    ? `Last synced ${formatRelative(payload.syncedAt, now)} · last ${payload.lookbackDays} days · a pause over ${payload.idleGapMinutes} min splits a session. Tune these in devtrack.config.json.`
+    ? `Last synced ${formatRelative(payload.syncedAt, now)} · last ${payload.lookbackDays} days · a pause over ${payload.idleGapMinutes} min splits a session${skipped}. Tune these in devtrack.config.json.`
     : 'No sync yet. The first sync writes public/data/sync.json.'
 
   function changeGoal(text: string) {

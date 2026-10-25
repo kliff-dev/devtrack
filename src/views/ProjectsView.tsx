@@ -7,6 +7,7 @@ import { ProjectCard } from '../components/ProjectCard.tsx'
 import { ProjectFormDialog } from '../components/ProjectFormDialog.tsx'
 import { SegmentedControl, type SegmentOption } from '../components/SegmentedControl.tsx'
 import { PROJECT_STATUSES, STATUS_LABELS } from '../constants.ts'
+import { codingMinutesByProject } from '../lib/stats.ts'
 import { useDevTrack } from '../store/DevTrackContext.ts'
 import type { Project, ProjectStatus } from '../types.ts'
 import './ProjectsView.css'
@@ -49,6 +50,7 @@ export function ProjectsView() {
     if (action.done || !action.projectId) continue
     openActionCounts.set(action.projectId, (openActionCounts.get(action.projectId) ?? 0) + 1)
   }
+  const minutesByProject = codingMinutesByProject(activity, new Date(0))
 
   const needle = query.trim().toLowerCase()
   const visible = projects
@@ -120,6 +122,7 @@ export function ProjectsView() {
                   project={project}
                   now={now}
                   openActions={openActionCounts.get(project.id) ?? 0}
+                  totalMinutes={minutesByProject.get(project.id) ?? 0}
                   onEdit={() => setEditing(project)}
                   onDelete={() => setDeleting(project)}
                 />

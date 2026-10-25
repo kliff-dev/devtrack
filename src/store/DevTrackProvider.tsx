@@ -18,7 +18,7 @@ import {
 } from '../lib/parsers.ts'
 import { pathKey } from '../lib/paths.ts'
 import { mergeSync, requestSync } from '../lib/sync.ts'
-import type { ActivityEntry, Project, SyncPayload } from '../types.ts'
+import type { ActivityEntry, NextAction, Project, SyncPayload } from '../types.ts'
 import { DevTrackContext, type DevTrackStore, type SyncState } from './DevTrackContext.ts'
 
 interface DevTrackProviderProps {
@@ -30,6 +30,7 @@ interface DevTrackProviderProps {
 interface Base {
   projects: Project[]
   activity: ActivityEntry[]
+  actions: NextAction[]
 }
 
 export function DevTrackProvider({ initialSync, children }: DevTrackProviderProps) {
@@ -65,9 +66,9 @@ export function DevTrackProvider({ initialSync, children }: DevTrackProviderProp
   // Merging needs projects, activity and the ignore list together; a ref keeps the
   // latest values available to callbacks without re-creating them on every change.
   // It is refreshed after every render, before any handler or later effect can run.
-  const latest = useRef({ projects, activity, ignoredPaths })
+  const latest = useRef({ projects, activity, actions, ignoredPaths })
   useEffect(() => {
-    latest.current = { projects, activity, ignoredPaths }
+    latest.current = { projects, activity, actions, ignoredPaths }
   })
 
   const applySync = useCallback(
@@ -75,6 +76,7 @@ export function DevTrackProvider({ initialSync, children }: DevTrackProviderProp
       const result = mergeSync({
         projects: base?.projects ?? latest.current.projects,
         activity: base?.activity ?? latest.current.activity,
+        actions: base?.actions ?? latest.current.actions,
         ignoredPaths: latest.current.ignoredPaths,
         payload,
         now: Date.now(),
@@ -126,9 +128,12 @@ export function DevTrackProvider({ initialSync, children }: DevTrackProviderProp
       saveProject(draft, id) {
         const timestamp = new Date().toISOString()
         const previous = id ? projects.find((project) => project.id === id) : undefined
+        // An edited project is the user's now; a sync no longer removes it.
         const nextProjects = id
           ? projects.map((project) =>
-              project.id === id ? { ...project, ...draft, updatedAt: timestamp } : project,
+              project.id === id
+                ? { ...project, ...draft, autoCreated: undefined, updatedAt: timestamp }
+                : project,
             )
           : [{ ...draft, id: createId(), createdAt: timestamp, updatedAt: timestamp }, ...projects]
         setProjects(nextProjects)
@@ -138,7 +143,7 @@ export function DevTrackProvider({ initialSync, children }: DevTrackProviderProp
         }
         // Linking a folder claims its synced activity straight away, not on the next sync.
         if (sync.payload && (draft.localPath ?? '') !== (previous?.localPath ?? '')) {
-          applySync(sync.payload, { projects: nextProjects, activity })
+          applySync(sync.payload, { projects: nextProjects, activity, actions })
         }
       },
 
@@ -207,7 +212,7 @@ export function DevTrackProvider({ initialSync, children }: DevTrackProviderProp
       resetToSampleData() {
         const sample = createSampleData()
         setActions(sample.actions)
-        if (sync.payload) applySync(sync.payload, { projects: sample.projects, activity: sample.activity })
+        if (sync.payload) applySync(sync.payload, sample)
         else {
           setProjects(sample.projects)
           setActivity(sample.activity)
@@ -216,7 +221,7 @@ export function DevTrackProvider({ initialSync, children }: DevTrackProviderProp
 
       clearAllData() {
         setActions([])
-        if (sync.payload) applySync(sync.payload, { projects: [], activity: [] })
+        if (sync.payload) applySync(sync.payload, { projects: [], activity: [], actions: [] })
         else {
           setProjects([])
           setActivity([])

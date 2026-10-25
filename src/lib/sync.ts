@@ -1,4 +1,4 @@
-import type { ActivityEntry, Project, SyncPayload } from '../types.ts'
+import type { ActivityEntry, NextAction, Project, SyncPayload } from '../types.ts'
 import { createId } from './id.ts'
 import { parseSyncPayload } from './parsers.ts'
 import { pathKey } from './paths.ts'
@@ -39,6 +39,8 @@ export async function requestSync(): Promise<SyncPayload> {
 export interface MergeInput {
   projects: Project[]
   activity: ActivityEntry[]
+  /** Used to decide whether an auto-created project is still in use. */
+  actions?: NextAction[]
   /** Folders whose auto-created project was deleted; they are not recreated. */
   ignoredPaths: string[]
   payload: SyncPayload
@@ -50,20 +52,38 @@ export interface MergeResult {
   projects: Project[]
   activity: ActivityEntry[]
   createdProjects: Project[]
+  removedProjects: Project[]
 }
 
 /**
  * Applies a sync payload to the current data. Synced entries are matched to projects
  * by folder (`localPath`); unknown folders become new projects unless ignored. The
  * payload is authoritative for synced entries, so re-syncing updates them in place,
- * while entries added by hand are always kept.
+ * while entries added by hand are always kept. Projects a sync created and nobody
+ * touched since are removed again once their folder leaves the sync.
  */
 export function mergeSync(input: MergeInput): MergeResult {
-  const { payload, now, makeId = createId } = input
+  const { payload, now, makeId = createId, actions = [] } = input
   const nowIso = new Date(now).toISOString()
   const ignored = new Set(input.ignoredPaths.map(pathKey))
+  const manual = input.activity.filter((entry) => !entry.source || entry.source === 'manual')
+
+  const syncedFolders = new Set(payload.projects.map((folder) => pathKey(folder.path)))
+  const inUse = (project: Project) =>
+    manual.some((entry) => entry.projectId === project.id) ||
+    actions.some((action) => action.projectId === project.id)
+  const removedProjects = input.projects.filter(
+    (project) =>
+      project.autoCreated &&
+      project.localPath &&
+      !syncedFolders.has(pathKey(project.localPath)) &&
+      !inUse(project),
+  )
+  const removedIds = new Set(removedProjects.map((project) => project.id))
+  const kept = input.projects.filter((project) => !removedIds.has(project.id))
+
   const byPath = new Map<string, Project>()
-  for (const project of input.projects) {
+  for (const project of kept) {
     if (project.localPath && !byPath.has(pathKey(project.localPath))) {
       byPath.set(pathKey(project.localPath), project)
     }
@@ -82,6 +102,7 @@ export function mergeSync(input: MergeInput): MergeResult {
       progress: 0,
       repoUrl: folder.repoUrl,
       localPath: folder.path,
+      autoCreated: true,
       createdAt: nowIso,
       updatedAt: nowIso,
     }
@@ -116,13 +137,13 @@ export function mergeSync(input: MergeInput): MergeResult {
     return { ...project, updatedAt, status }
   }
 
-  const manual = input.activity.filter((entry) => !entry.source || entry.source === 'manual')
   return {
     projects: [
-      ...input.projects.map((project) => touch(project, false)),
+      ...kept.map((project) => touch(project, false)),
       ...createdProjects.map((project) => touch(project, true)),
     ],
-    activity: [...manual, ...imported],
+    activity: [...manual, ...imported.filter((entry) => !removedIds.has(entry.projectId))],
     createdProjects,
+    removedProjects,
   }
 }

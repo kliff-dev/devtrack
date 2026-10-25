@@ -1,4 +1,4 @@
-import { formatRelative } from '../lib/format.ts'
+import { formatDuration, formatRelative } from '../lib/format.ts'
 import { isHttpUrl } from '../lib/parsers.ts'
 import { folderName } from '../lib/paths.ts'
 import type { Project } from '../types.ts'
@@ -12,12 +12,14 @@ import './ProjectCard.css'
 interface ProjectCardProps {
   project: Project
   openActions: number
+  /** Coding-session minutes on record for the project. */
+  totalMinutes: number
   now: number
   onEdit: () => void
   onDelete: () => void
 }
 
-export function ProjectCard({ project, openActions, now, onEdit, onDelete }: ProjectCardProps) {
+export function ProjectCard({ project, openActions, totalMinutes, now, onEdit, onDelete }: ProjectCardProps) {
   // Stored data is user-editable, so only link out to real http(s) URLs.
   const repoUrl = project.repoUrl && isHttpUrl(project.repoUrl) ? project.repoUrl : undefined
 
@@ -66,6 +68,12 @@ export function ProjectCard({ project, openActions, now, onEdit, onDelete }: Pro
       </div>
 
       <footer className="project-card__footer">
+        {totalMinutes > 0 && (
+          <span className="project-card__time" title="Coding sessions on record">
+            <Icon name="activity" size={13} />
+            {formatDuration(totalMinutes)}
+          </span>
+        )}
         <span>
           <Icon name="clock" size={13} />
           Updated {formatRelative(project.updatedAt, now)}

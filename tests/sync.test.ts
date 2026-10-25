@@ -48,6 +48,7 @@ test('mergeSync creates projects for new folders and attributes entries by folde
   assert.equal(result.createdProjects.length, 1)
   const [created] = result.projects
   assert.equal(created.localPath, FOLDER)
+  assert.equal(created.autoCreated, true)
   assert.equal(created.status, 'active')
   assert.deepEqual(created.technologies, ['React'])
   assert.equal(created.updatedAt, '2026-10-24T10:00:00.000Z', 'updatedAt follows the latest entry')
@@ -100,6 +101,28 @@ test('mergeSync starts quiet folders as paused', () => {
   const result = mergeSync({ projects: [], activity: [], ignoredPaths: [], payload: quiet, now: NOW, makeId })
   assert.equal(result.projects[0].status, 'paused')
   assert.equal(result.projects[0].updatedAt, '2026-08-01T00:00:00.000Z')
+})
+
+test('mergeSync removes untouched auto-created projects whose folder left the sync', () => {
+  const gone = project({ id: 'gone', localPath: 'C:\\Users\\dev\\Projects\\deleted', autoCreated: true })
+  const edited = project({ id: 'edited', localPath: 'C:\\Users\\dev\\Projects\\edited' })
+  const withAction = project({ id: 'acted', localPath: 'C:\\Users\\dev\\Projects\\acted', autoCreated: true })
+  const withManual = project({ id: 'noted', localPath: 'C:\\Users\\dev\\Projects\\noted', autoCreated: true })
+  const staleEntry: ActivityEntry = { id: 'codex:gone', projectId: 'gone', kind: 'session', summary: 'x', timestamp: '2026-09-01T00:00:00.000Z', durationMinutes: 30, source: 'codex' }
+  const manualEntry: ActivityEntry = { id: 'm2', projectId: 'noted', kind: 'milestone', summary: 'Launched', timestamp: '2026-09-01T00:00:00.000Z' }
+  const result = mergeSync({
+    projects: [gone, edited, withAction, withManual],
+    activity: [staleEntry, manualEntry],
+    actions: [{ id: 'a1', title: 'Do it', projectId: 'acted', priority: 'low', done: false, createdAt: '2026-09-01T00:00:00.000Z' }],
+    ignoredPaths: [],
+    payload: payload(),
+    now: NOW,
+    makeId,
+  })
+  assert.deepEqual(result.removedProjects.map((p) => p.id), ['gone'])
+  assert.deepEqual(result.projects.map((p) => p.id).sort(), ['acted', 'edited', 'noted', result.createdProjects[0].id].sort())
+  assert.ok(!result.activity.some((entry) => entry.projectId === 'gone'), 'the removed project’s synced entries go too')
+  assert.ok(result.activity.some((entry) => entry.id === 'm2'), 'manual entries are kept')
 })
 
 test('parseSyncPayload accepts the real shape and rejects malformed data', () => {

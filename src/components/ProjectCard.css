@@ -111,6 +111,11 @@
   }
 }
 
+.project-card__time {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
 .project-card__folder {
   min-width: 0;
   max-width: 100%;

@@ -13,6 +13,12 @@ export interface Project {
   repoUrl?: string
   /** Folder on this machine; synced activity from it is attributed to the project. */
   localPath?: string
+  /**
+   * Set when a sync created the project and the user hasn't edited it since. Such a
+   * project disappears again if its folder drops out of the sync, unless it has
+   * manual entries or actions.
+   */
+  autoCreated?: boolean
   createdAt: string
   updatedAt: string
 }
@@ -104,4 +110,6 @@ export interface SyncPayload {
   sources: SyncSourceStatus[]
   projects: SyncProject[]
   activity: SyncEntry[]
+  /** Folders with activity that were left out: deleted from disk, or excluded in the config. */
+  skippedFolders?: number
 }

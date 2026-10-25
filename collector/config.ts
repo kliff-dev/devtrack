@@ -9,6 +9,10 @@ export interface CollectorConfig {
   idleGapMinutes: number
   /** Folders whose immediate subfolders are checked for git repositories. */
   scanDirs: string[]
+  /** Folders to leave out even though they have activity. */
+  excludePaths: string[]
+  /** Keep activity for folders that no longer exist on disk (abandoned or moved projects). */
+  includeMissingFolders: boolean
   claudeDir: string
   codexDir: string
   /** Where the sync payload is written (absolute after loading). */
@@ -23,11 +27,16 @@ const DEFAULTS: CollectorConfig = {
   lookbackDays: 90,
   idleGapMinutes: 30,
   scanDirs: [join(HOME, 'Projects')],
+  excludePaths: [],
+  includeMissingFolders: false,
   claudeDir: process.env.CLAUDE_CONFIG_DIR ?? join(HOME, '.claude'),
   codexDir: process.env.CODEX_HOME ?? join(HOME, '.codex'),
   outFile: 'public/data/sync.json',
   cacheDir: 'node_modules/.cache/devtrack',
 }
+
+const stringList = (value: unknown): string[] | undefined =>
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : undefined
 
 function readConfigFile(root: string): Partial<CollectorConfig> {
   const file = join(root, CONFIG_FILE)
@@ -38,7 +47,11 @@ function readConfigFile(root: string): Partial<CollectorConfig> {
   const config: Partial<CollectorConfig> = {}
   if (typeof raw.lookbackDays === 'number') config.lookbackDays = raw.lookbackDays
   if (typeof raw.idleGapMinutes === 'number') config.idleGapMinutes = raw.idleGapMinutes
-  if (Array.isArray(raw.scanDirs)) config.scanDirs = raw.scanDirs.filter((d) => typeof d === 'string')
+  const scanDirs = stringList(raw.scanDirs)
+  if (scanDirs) config.scanDirs = scanDirs
+  const excludePaths = stringList(raw.excludePaths)
+  if (excludePaths) config.excludePaths = excludePaths
+  if (typeof raw.includeMissingFolders === 'boolean') config.includeMissingFolders = raw.includeMissingFolders
   if (typeof raw.claudeDir === 'string') config.claudeDir = raw.claudeDir
   if (typeof raw.codexDir === 'string') config.codexDir = raw.codexDir
   if (typeof raw.outFile === 'string') config.outFile = raw.outFile
@@ -52,6 +65,7 @@ export function loadConfig(root: string, overrides: Partial<CollectorConfig> = {
   return {
     ...config,
     scanDirs: config.scanDirs.map(expandHome),
+    excludePaths: config.excludePaths.map(expandHome),
     claudeDir: expandHome(config.claudeDir),
     codexDir: expandHome(config.codexDir),
     outFile: resolve(root, expandHome(config.outFile)),

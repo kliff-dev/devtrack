@@ -53,6 +53,7 @@ function isProject(value: unknown): value is Project {
     isNumber(value.progress) &&
     isOptional(value.repoUrl, isString) &&
     isOptional(value.localPath, isString) &&
+    isOptional(value.autoCreated, isBoolean) &&
     isString(value.createdAt) &&
     isString(value.updatedAt)
   )
@@ -159,7 +160,8 @@ export function parseSyncPayload(value: unknown): SyncPayload | undefined {
     value.version !== 1 ||
     !isString(value.syncedAt) ||
     !isNumber(value.lookbackDays) ||
-    !isNumber(value.idleGapMinutes)
+    !isNumber(value.idleGapMinutes) ||
+    !isOptional(value.skippedFolders, isNumber)
   ) {
     return undefined
   }
@@ -175,6 +177,7 @@ export function parseSyncPayload(value: unknown): SyncPayload | undefined {
     sources,
     projects,
     activity,
+    skippedFolders: value.skippedFolders as number | undefined,
   }
 }
 

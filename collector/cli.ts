@@ -41,7 +41,10 @@ function summary(payload: SyncPayload, outFile: string): string {
         : `${source.sessions ?? 0} sessions`
     lines.push(source.available ? `  ${label} ${count}  (${source.note ?? ''})` : `  ${label} unavailable: ${source.note}`)
   }
-  lines.push(`  Projects     ${payload.projects.length} folders with activity`)
+  const skipped = payload.skippedFolders
+    ? ` (${payload.skippedFolders} skipped: deleted or excluded)`
+    : ''
+  lines.push(`  Projects     ${payload.projects.length} folders with activity${skipped}`)
   lines.push(`  → ${outFile}  (${payload.activity.length} entries, last ${payload.lookbackDays} days)`)
   return lines.join('\n')
 }
