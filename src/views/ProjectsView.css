@@ -1,0 +1,47 @@
+.projects-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.search {
+  position: relative;
+  flex: 1 1 260px;
+  max-width: 380px;
+
+  .icon {
+    position: absolute;
+    top: 50%;
+    left: 11px;
+    color: var(--text-muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .input {
+    padding-left: 34px;
+  }
+}
+
+.projects-toolbar__sort {
+  width: auto;
+  margin-left: auto;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 720px) {
+  .search {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .projects-toolbar__sort {
+    margin-left: 0;
+  }
+}

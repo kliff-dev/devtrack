@@ -1,0 +1,165 @@
+.next-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.next-actions__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.next-actions__row {
+  display: flex;
+  gap: 8px;
+}
+
+.next-actions__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  animation: rise-in 0.15s ease-out;
+}
+
+.next-actions__empty {
+  padding: 12px 0 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.next-actions__completed {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.next-actions__toggle {
+  align-self: flex-start;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.action-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  margin: 0 -8px;
+  padding: 8px;
+  border-radius: var(--radius);
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: var(--surface-raised);
+  }
+
+  .checkbox {
+    margin-top: 1px;
+  }
+}
+
+.action-item__body {
+  min-width: 0;
+}
+
+.action-item__title {
+  display: block;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--text);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+
+  [data-done] & {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--border-hover);
+  }
+}
+
+.action-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.action-item__project {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-item__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.action-item__delete {
+  width: 26px;
+  height: 26px;
+  margin: -3px -2px 0 0;
+}
+
+/* Reveal the delete button on hover where hover exists; always show it on touch. */
+@media (hover: hover) {
+  .action-item__delete {
+    opacity: 0;
+  }
+
+  .action-item:hover .action-item__delete,
+  .action-item__delete:focus-visible {
+    opacity: 1;
+  }
+}
+
+.priority-tag {
+  --priority-color: var(--slate);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--priority-color);
+  }
+
+  &[data-priority='high'] {
+    --priority-color: var(--red);
+  }
+
+  &[data-priority='medium'] {
+    --priority-color: var(--amber);
+  }
+}

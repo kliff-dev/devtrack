@@ -1,0 +1,38 @@
+.status-badge {
+  --status-color: var(--slate);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--status-color) 13%, transparent);
+  color: var(--status-color);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &[data-status='active'] {
+    --status-color: var(--green);
+  }
+
+  &[data-status='planning'] {
+    --status-color: var(--blue);
+  }
+
+  &[data-status='paused'] {
+    --status-color: var(--amber);
+  }
+
+  &[data-status='completed'] {
+    --status-color: var(--violet);
+  }
+}
+
+.status-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}

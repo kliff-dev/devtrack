@@ -1,0 +1,5 @@
+{
+  "lookbackDays": 90,
+  "idleGapMinutes": 30,
+  "scanDirs": ["~/Projects", "C:\\wamp64\\www"]
+}

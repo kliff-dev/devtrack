@@ -1,0 +1,74 @@
+.modal {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100svh - 48px);
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+
+  &[open] {
+    display: flex;
+    animation: rise-in 0.18s ease-out;
+  }
+
+  &::backdrop {
+    background: rgb(4 6 10 / 0.72);
+    backdrop-filter: blur(3px);
+    animation: fade-in 0.18s ease-out;
+  }
+}
+
+.modal--sm {
+  width: min(420px, calc(100vw - 32px));
+}
+
+.modal__panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 20px 0 24px;
+}
+
+.modal__title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.modal__description {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* A form inside the modal spans body + footer so the footer can hold the submit button. */
+.modal__form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.modal__body {
+  flex: 1;
+  min-height: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}

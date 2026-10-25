@@ -1,0 +1,21 @@
+.progress {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 15%, var(--surface-raised));
+}
+
+.progress__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.progress[data-complete] {
+  background: color-mix(in oklab, var(--green) 15%, var(--surface-raised));
+
+  .progress__fill {
+    background: var(--green);
+  }
+}

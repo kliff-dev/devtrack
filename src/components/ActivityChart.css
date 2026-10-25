@@ -1,0 +1,150 @@
+.activity-chart {
+  --gutter: 30px;
+
+  margin: 0;
+  padding-top: 18px;
+}
+
+.activity-chart__plot {
+  position: relative;
+  height: 180px;
+  margin-left: var(--gutter);
+}
+
+.activity-chart__gridline {
+  position: absolute;
+  inset-inline: 0;
+  height: 0;
+  border-top: 1px solid var(--border);
+}
+
+.activity-chart__tick {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 8px);
+  transform: translateY(-50%);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.activity-chart__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.activity-chart__columns,
+.activity-chart__axis {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: 2px;
+}
+
+.activity-chart__columns {
+  position: absolute;
+  inset: 0;
+}
+
+.activity-chart__column {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 6px 6px 0 0;
+  outline: none;
+  transition: background-color 0.15s;
+
+  &[data-active] {
+    background: color-mix(in oklab, var(--text) 5%, transparent);
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+}
+
+.activity-chart__bar {
+  position: relative;
+  width: min(24px, 64%);
+  min-height: 3px;
+  border-radius: 4px 4px 0 0;
+  background: var(--accent);
+  transition:
+    height 0.4s ease,
+    filter 0.15s;
+
+  [data-active] > & {
+    filter: brightness(1.18);
+  }
+}
+
+.activity-chart__peak {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.activity-chart__tooltip {
+  position: absolute;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 10px;
+  transform: translateX(-50%);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.45);
+  white-space: nowrap;
+  pointer-events: none;
+
+  strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  span {
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+
+  [data-align='start'] > & {
+    left: 0;
+    transform: none;
+  }
+
+  [data-align='end'] > & {
+    right: 0;
+    left: auto;
+    transform: none;
+  }
+}
+
+.activity-chart__axis {
+  margin: 8px 0 0 var(--gutter);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+
+  span {
+    white-space: nowrap;
+  }
+
+  [data-today] {
+    font-weight: 600;
+    color: var(--text);
+  }
+}

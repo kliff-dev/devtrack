@@ -1,0 +1,149 @@
+.activity-project-filter {
+  width: auto;
+  min-width: 180px;
+}
+
+.activity-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  align-items: start;
+  gap: 16px;
+}
+
+.project-time {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-time__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.project-time__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.project-time__label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+
+  span {
+    overflow: hidden;
+    color: var(--text-secondary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+}
+
+.project-time__track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-raised);
+}
+
+.project-time__bar {
+  height: 100%;
+  min-width: 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+/* The type filter needs room, so it wraps under the title on narrower panels. */
+.activity-timeline .panel__header {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.timeline__more {
+  align-self: center;
+}
+
+/* Share of session time per tool inside the Coding time card. */
+.tool-split {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  white-space: normal;
+}
+
+.tool-split__meter {
+  display: flex;
+  gap: 2px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-raised);
+
+  span {
+    display: block;
+    height: 100%;
+    min-width: 3px;
+  }
+}
+
+.tool-split__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  list-style: none;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.tool-split__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+@media (max-width: 1280px) {
+  .activity-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1120px) {
+  .activity-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .activity-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

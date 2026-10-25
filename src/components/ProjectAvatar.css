@@ -1,0 +1,11 @@
+.project-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in oklab, var(--avatar-color) 30%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--avatar-color) 15%, var(--surface));
+  color: var(--avatar-color);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
